@@ -1,7 +1,3 @@
-Here is a professional `README.md` file for your **Duplicate Question Pair** project. I have structured it to highlight the progression from basic NLP techniques to advanced feature engineering, which makes for a strong portfolio entry.
-
----
-
 # Duplicate Question Detection System
 
 ### 📌 Project Overview
