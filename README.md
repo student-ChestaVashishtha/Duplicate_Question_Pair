@@ -1,144 +1,210 @@
-# Duplicate Question Detection System
+# Duplicate Question Pair Detection (NLP → Transformers)
 
-### 📌 Project Overview
+## 📌 Overview
 
-This project applies **Natural Language Processing (NLP)** and **Machine Learning** techniques to identify semantically similar or duplicate questions. Inspired by the **Quora Question Pairs** challenge, the goal is to improve the efficiency of Q&A platforms by detecting redundancy.
+This project focuses on **Duplicate Question Pair Detection**, a core NLP problem where the goal is to determine whether two questions are semantically equivalent. Such systems are widely used in platforms like **Quora, Stack Overflow, customer support forums, and search engines** to reduce redundancy and improve information retrieval.
 
-The project is divided into two approaches:
+What makes this project strong is its **comparative and progressive approach**:
 
-1. **Basic Approach:** Uses simple text statistics and standard vectorization (TF-IDF/BoW).
-2. **Advanced Approach:** Engineers complex features using **Fuzzy Logic**, **Token Ratios**, and **Sequence Matching** to capture semantic meaning.
+* Starting with **basic NLP features** (baseline)
+* Improving performance using **advanced feature engineering**
+* Finally leveraging **Transformer / LLM-based semantic models**
 
----
-
-### 📂 Repository Structure
-
-| File Name | Description |
-| --- | --- |
-| `without_advanced_features.ipynb` | **Baseline Model:** Implements basic text preprocessing (Stemming, Stopword removal) and feature engineering (Length, Common words). Uses **TF-IDF** for vectorization. |
-| `With_Advanced_Features.ipynb` | **Advanced Model:** Implements sophisticated feature engineering including **FuzzyWuzzy** ratios, token features, and longest common substring analysis to improve accuracy. |
-| `train.csv` | The dataset containing question pairs and the `is_duplicate` target label. |
+This progression clearly demonstrates the evolution from **lexical similarity** to **deep semantic understanding**.
 
 ---
 
-### 🛠️ Tech Stack
+## 🧠 Problem Statement
 
-* **Language:** Python
-* **Data Manipulation:** Pandas, NumPy
-* **NLP & Preprocessing:** NLTK (WordNet Lemmatizer, Stopwords), Re (Regex)
-* **Feature Engineering:** FuzzyWuzzy (String Matching), Distance (Levenshtein)
-* **Visualization:** Matplotlib, Seaborn
-* **Machine Learning:** Scikit-Learn (Random Forest/XGBoost), TF-IDF
+Given a pair of questions `(q1, q2)`, predict whether they are **duplicates** (i.e., convey the same meaning).
 
----
+* **Input:** Two natural language questions
+* **Output:** Binary label
 
-### ⚙️ Feature Engineering
-
-This project relies heavily on manual feature engineering to capture the relationship between two questions.
-
-#### 1. Basic Features (Notebook 1)
-
-* **`q1_len` / `q2_len**`: Character length of each question.
-* **`q1_num_words` / `q2_num_words**`: Word count of each question.
-* **`word_common`**: Number of unique words shared between the two questions.
-* **`word_total`**: Total number of unique words in both questions combined.
-* **`word_share`**: Ratio of common words to total words (`word_common` / `word_total`).
-
-#### 2. Advanced Features (Notebook 2)
-
-To capture deeper semantic similarity, the following features were engineered:
-
-**Token Features:**
-
-* **`cwc_min` / `cwc_max**`: Ratio of common *words* to the length of the smaller/larger question.
-* **`csc_min` / `csc_max**`: Ratio of common *stopwords* to the length of the smaller/larger question.
-* **`ctc_min` / `ctc_max**`: Ratio of common *tokens* to the length of the smaller/larger question.
-* **`last_word_eq`**: 1 if the last word of both questions is the same, else 0.
-* **`first_word_eq`**: 1 if the first word of both questions is the same, else 0.
-
-**Fuzzy Features (using FuzzyWuzzy):**
-
-* **`fuzz_ratio`**: Standard Levenshtein distance similarity.
-* **`fuzz_partial_ratio`**: Similarity score based on best partial match.
-* **`token_sort_ratio`**: Similarity after sorting tokens alphabetically (handles jumbled word order).
-* **`token_set_ratio`**: Similarity ignoring duplicate words (handles different lengths).
-
-**Length Based Features:**
-
-* **`abs_len_diff`**: Absolute difference in word counts.
-* **`mean_len`**: Average word count of the pair.
-* **`longest_substr_ratio`**: Ratio of the longest common substring to the question length.
+  * `1` → Duplicate
+  * `0` → Not Duplicate
 
 ---
 
-### 🚀 How to Run
-
-1. Clone the repository.
-2. Install dependencies:
-```bash
-pip install numpy pandas nltk matplotlib seaborn fuzzywuzzy distance scikit-learn
+## 📂 Project Structure
 
 ```
-
-
-3. Download the NLTK data:
-```python
-import nltk
-nltk.download('stopwords')
-nltk.download('punkt')
-nltk.download('wordnet')
-
+Duplicate_Question_Pair/
+│
+├── without_advanced_features.ipynb   # Baseline NLP features
+├── With_Advanced_Features.ipynb      # Advanced feature engineering
+├── withllm.py                        # Transformer / LLM-based model
+├── requirements.txt
+└── README.md
 ```
-
-
-4. Run `With_Advanced_Features.ipynb` to see the complete pipeline including advanced feature extraction.
-
-Here is the **Accuracy Improvements** section formatted specifically for your `README.md`. You can copy and paste this block directly into your file, likely after the "Feature Engineering" or "Model Architecture" section.
 
 ---
 
-## 📈 Accuracy & Performance Improvements
+## 📊 Dataset
 
-The core objective of this project was to move beyond simple keyword matching to detecting **semantic equivalence**. The transition from a baseline model to an advanced feature-engineered model resulted in significant accuracy gains.
+The project is based on the **Quora Question Pairs** dataset, which contains labeled pairs of questions indicating whether they are semantically duplicate.
 
-### 1. Baseline vs. Advanced Approach
+* `question1`, `question2`: Text inputs
+* `is_duplicate`: Target label
 
-| Component | Baseline Approach | Advanced Approach |
-| --- | --- | --- |
-| **Vectorization** | TF-IDF (Sparse Matrix) | TF-IDF + Weighted Word2Vec (Optional) |
-| **Feature Extraction** | Basic Length & Word Counts | Fuzzy Ratios, Token Ratios, Structural Features |
-| **Handling Typos** | Fails (treats "Pyton"  "Python") | Robust (via Levenshtein Distance) |
-| **Handling Word Order** | Fails (Bag-of-Words ignores order) | Robust (via `token_sort_ratio`) |
-| **Model Type** | Logistic Regression / Naive Bayes | Random Forest / XGBoost |
+The dataset is preprocessed and split into training and evaluation sets with appropriate handling of class imbalance.
 
-### 2. Why the Advanced Model is Better?
+---
 
-The baseline model struggled with questions that had the **same meaning but different wording** (e.g., *"How can I learn coding?"* vs. *"What is the best way to start programming?"*). The advanced features addressed this by mathematically quantifying similarity:
+## 🔍 Methodology (Comparative Approach)
 
-* **Fuzzy Logic (Levenshtein Distance):**
-* Features like `fuzz_ratio` and `token_sort_ratio` allowed the model to detect duplicate questions even when words were misspelled or jumbled.
+### 1️⃣ Baseline Model — Basic NLP Features
 
+**File:** `without_advanced_features.ipynb`
 
-* **Token & Stopword Ratios:**
-* By calculating ratios like `cwc_min` (Common Word Count / Min Length), the model could identify when a short question was essentially a subset of a longer question, correcting for length disparities.
+This notebook establishes a **simple and interpretable baseline** using classical NLP techniques.
 
+**Key Steps:**
 
-* **Structural Matching:**
-* Features like `last_word_eq` helped the model identify questions asking for the same *type* of answer (e.g., both ending in "India?").
+* Text preprocessing: lowercasing, tokenization, stopword removal
+* Feature extraction:
 
-Based on the code structure in your notebooks, moving from the "Basic" to the "Advanced" model typically yields a **significant performance jump**, usually improving accuracy by **10% to 15%** and reducing Log Loss (the primary error metric) by nearly **40%**.
+  * Question length and length difference
+  * Common word count and ratios
+  * Token overlap metrics
+* Traditional ML models trained on handcrafted features
 
-Here is the breakdown of the improvement you can discuss in interviews or include in your project documentation.
+**Insight:**
+While simple and interpretable, these features struggle to capture paraphrases and semantic similarity.
 
-### **The Metric Gap (Typical Results)**
+---
 
-Since the specific execution results (the final printouts) weren't in the viewable snippets, here are the standard benchmarks for this specific Quora project architecture:
+### 2️⃣ Enhanced Model — Advanced NLP Feature Engineering
 
-| Metric | Basic Model (TF-IDF) | Advanced Model (Feature Eng.) | **The Improvement** |
-| --- | --- | --- | --- |
-| **Accuracy** | ~70% - 73% | **~80% - 84%** | **+10% Boost** (Huge in NLP terms) |
-| **Log Loss** | ~0.55 - 0.60 | **~0.35 - 0.40** | **Lower is better.** You reduced error significantly. |
+**File:** `With_Advanced_Features.ipynb`
 
+This stage improves upon the baseline by enriching the feature space with more expressive similarity signals.
 
-* **Baseline Accuracy:** Limited by the sparsity of the TF-IDF matrix.
-* **Advanced Accuracy:** Significantly higher Log-Loss reduction and F1-Score due to the use of tree-based classifiers (Random Forest/XGBoost) which effectively learned non-linear relationships between the engineered features.or **XGBoost** classifier for final prediction.
+**Advanced Features Include:**
+
+* TF-IDF vector representations
+* Fuzzy string matching scores
+* Character-level similarity metrics
+* Semantic overlap and ratio-based features
+
+**Outcome:**
+
+* Improved performance over the baseline model
+* Better handling of lexical variations
+* Clear demonstration of the impact of feature engineering
+
+**Limitation:**
+Despite improvements, these methods still rely heavily on surface-level text similarity.
+
+---
+
+### 3️⃣ Advanced Model — Transformer / LLM-Based Semantic Similarity
+
+**File:** `withllm.py`
+
+This module implements a **deep learning–based solution** using pre-trained Transformer models to capture contextual meaning.
+
+**Key Highlights:**
+
+* Uses Transformer-based sentence embeddings (e.g., Sentence-BERT style models)
+* Captures deep semantic relationships beyond exact word overlap
+* Computes similarity scores and applies threshold-based classification
+* Structured as a clean, inference-ready Python pipeline
+
+**Advantages:**
+
+* Strong semantic understanding
+* Robust to paraphrasing and rewording
+* Suitable for real-world deployment scenarios
+
+---
+
+## 🔄 Comparative Summary
+
+| Approach           | Strengths                   | Limitations           |
+| ------------------ | --------------------------- | --------------------- |
+| Basic NLP Features | Simple, fast, interpretable | Fails on paraphrases  |
+| Advanced Features  | Better lexical coverage     | Manual feature effort |
+| Transformer Models | Deep semantic understanding | Higher compute cost   |
+
+This comparison justifies the transition from classical NLP methods to modern transformer-based approaches for production-grade systems.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Programming Language:** Python
+* **Libraries & Frameworks:**
+
+  * Scikit-learn
+  * Hugging Face Transformers / Sentence-Transformers
+  * PyTorch
+  * NLTK / spaCy (for preprocessing)
+* **Modeling:** Classical ML + Transformer-based embeddings
+
+---
+
+## 🚀 How to Run
+
+1. Clone the repository
+
+   ```bash
+   git clone https://github.com/student-ChestaVashishtha/Duplicate_Question_Pair.git
+   cd Duplicate_Question_Pair
+   ```
+
+2. Install dependencies
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run transformer-based model
+
+   ```bash
+   python withllm.py
+   ```
+
+4. Open notebooks for feature-based experiments
+
+   ```bash
+   jupyter notebook
+   ```
+
+---
+
+## 📈 Key Learnings
+
+* Classical NLP methods provide interpretability but limited semantic power
+* Feature engineering can significantly improve traditional models
+* Transformer-based models outperform feature-based approaches for semantic tasks
+* Model selection should balance performance, interpretability, and computational cost
+
+---
+
+## 📌 Applications
+
+* Duplicate detection in Q&A platforms
+* FAQ deduplication systems
+* Search query normalization
+* Chatbots and conversational AI
+
+---
+
+## 🔮 Future Enhancements
+
+* Add quantitative performance comparison (Accuracy, F1-score)
+* Deploy model using FastAPI or Streamlit
+* Extend to multilingual duplicate detection
+* Integrate approximate nearest neighbor search for large-scale retrieval
+
+---
+
+## 👤 Author
+
+**Chesta Vashishtha**
+Machine Learning & NLP Enthusiast | Transformer-based Models
+
+---
+
+⭐ If you find this project useful, feel free to star the repository!
