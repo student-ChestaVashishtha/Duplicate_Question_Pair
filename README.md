@@ -144,34 +144,15 @@ This comparison justifies the transition from classical NLP methods to modern tr
 
 ---
 
-## 🚀 How to Run
-
-1. Clone the repository
-
-   ```bash
-   git clone https://github.com/student-ChestaVashishtha/Duplicate_Question_Pair.git
-   cd Duplicate_Question_Pair
-   ```
-
-2. Install dependencies
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Run transformer-based model
-
-   ```bash
-   python withllm.py
-   ```
-
-4. Open notebooks for feature-based experiments
-
-   ```bash
-   jupyter notebook
-   ```
-
+## 🖥️ Interactive Demo Website
+An interactive demo website was developed to showcase the system:
+- Accepts two questions as input
+- Outputs whether they are duplicates with similarity scores
+- Demonstrates real-world usage
+- Video recording of the demo available for reference:  https://drive.google.com/file/d/1RT-P5L5aJAeAIQvR4frqez0nxdpKW6Yp/view?usp=sharing
 ---
+
+
 
 ## 📈 Key Learnings
 
